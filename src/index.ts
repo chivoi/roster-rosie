@@ -35,7 +35,7 @@ const rotateLead = (): void => {
   nextLeadIndex = (nextLeadIndex + 1) % rosterMembers.length
 }
 
-const reportLeadJob = schedule.scheduleJob('*/2 * * * *', () => {
+const reportLeadJob = schedule.scheduleJob('0 08 * * *', () => {
   const currentLead = rosterMembers[currentLeadIndex];
   const nextLead = rosterMembers[nextLeadIndex];
 
