@@ -1,45 +1,59 @@
-import oceanRoster from "./files/ocean-roster.json";
+import roster from "./files/ocean-roster.json";
 import schedule from 'node-schedule';
 import axios from 'axios';
+import path from "path";
 
+require('dotenv').config({ path: path.resolve(__dirname, '../.env') });
 
-// Persist current standup lead: write to file, read it from file
-// Write into current lead file every day?
-// If the app dies on Friday, it will not update.
-// Check if it's Friday/Monday => yes => write new current lead to file
-// Changes to the list (in case someone's on holiday)
+// @TODO:
+// - If the app dies on Friday, it will not update.
+//    - Check if it's Friday/Monday => yes => write new current lead to file
 
-interface OceanList {
-  members: {
-    name: string;
-    slackID: string;
-  }[];
+// - Changes to the list (in case someone's on holiday)
+//    - is it possible as a step in Slack workflow?
+
+// - TOKEN REVOKED error we need to deal with it
+
+interface TeamMember {
+  name: string,
+  slackID: string
 }
 
-const getCurrentAndNextLeadAndRotate = (list: OceanList) => {
-  const current = list.members.shift();
-  let next;
-  if (current) {
-    list.members.push(current);
-    next = list.members[0];
+
+const SLACK_WEBHOOK_URL: string = process.env.WEBHOOK_URL || '';
+if (!SLACK_WEBHOOK_URL) {
+  throw new Error("Failed to load env config")
+}
+
+
+const rosterMembers: TeamMember[] = roster.members;
+let currentLeadIndex: number = 0;
+let nextLeadIndex: number = 1;
+
+const rotateLead = (): void => {
+  currentLeadIndex = nextLeadIndex;
+  nextLeadIndex = (nextLeadIndex + 1) % rosterMembers.length
+}
+
+const reportLeadJob = schedule.scheduleJob('*/2 * * * *', () => {
+  const currentLead = rosterMembers[currentLeadIndex];
+  const nextLead = rosterMembers[nextLeadIndex];
+
+  // rotate the lead on Monday
+  const today = new Date();
+  if (today.getDay() === 1) {
+    rotateLead();
   }
-  return { current, next };
-};
 
-
-const job = schedule.scheduleJob('*/2 * * * *', function () {
-
-  const currentLead = getCurrentAndNextLeadAndRotate(oceanRoster);
-
-  axios.post('https://hooks.slack.com/workflows/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', {
+  // post the lead and next info to Slack
+  axios.post(SLACK_WEBHOOK_URL, {
     standup_lead: currentLead.slackID,
-    next: oceanRoster.members[0].slackID
+    next: nextLead.slackID
   }).then(response => {
     console.log(response.status)
   }).catch(e => {
-    console.log(e.response.statusText)
+    console.log(e.status)
   })
 })
 
-
-job.invoke();
+reportLeadJob.invoke();
