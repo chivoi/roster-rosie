@@ -54,6 +54,8 @@ app.get('/api/next-lead', (req, res) => {
 
 app.post('/api/lead/:id', (req, res) => {
   try {
+    console.log(req.params.id);
+    console.log(typeof req.params.id);
     const leadIndex = parseInt(req.params.id as string);
     if (leadIndex > rosterMembers.length - 1) {
       res.send({ error: 'Lead Index is greater than the number of team member in ocean' });
