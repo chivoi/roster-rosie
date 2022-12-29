@@ -37,11 +37,19 @@ const writeRoaster = (current: number, next: number) => {
   }
 };
 
+const rotateLead = (newLeadIndex: number): void => {
+  currentLeadIndex = newLeadIndex || nextLeadIndex;
+  nextLeadIndex = (currentLeadIndex + 1) % rosterMembers.length;
+  // writeRoaster(currentLeadIndex, newLeadIndex);
+};
+
+// ROUTES
+
 app.listen(3000, async () => {
   await readRoaster();
   console.log('===== App starts =====');
-  scheduleTask();
-  console.log('===== Schedule Task =====');
+  // scheduleTask();
+  // console.log('===== Schedule Task =====');
 });
 
 app.get('/api/all-team-member', (req, res) => {
@@ -82,28 +90,11 @@ app.post('/api/lead/next', (req, res) => {
   }
 });
 
-const rotateLead = (newLeadIndex: number): void => {
-  currentLeadIndex = newLeadIndex || nextLeadIndex;
-  nextLeadIndex = (currentLeadIndex + 1) % rosterMembers.length;
-  // writeRoaster(currentLeadIndex, newLeadIndex);
-};
-
-const scheduleTask = (): Job => {
-  const rule = new schedule.RecurrenceRule();
-  rule.hour = 8;
-  rule.minute = 0;
-  rule.dayOfWeek = new Range(1, 5);
-  rule.tz = 'Australia/Melbourne';
-  return schedule.scheduleJob(rule, () => {
-    // rotate the lead on Monday
-    const today = new Date();
-    if (today.getDay() === 1) {
-      rotateLead(nextLeadIndex);
-    }
-
+app.post('/api/message-slack', (req, res) => {
+  try {
     const currentLead = rosterMembers[currentLeadIndex];
     const nextLead = rosterMembers[nextLeadIndex];
-    // post the lead and next info to Slack!
+
     axios
       .post(SLACK_WEBHOOK_URL!, {
         standup_lead: currentLead.slackID,
@@ -111,9 +102,44 @@ const scheduleTask = (): Job => {
       })
       .then((response) => {
         console.log(`===== Sent slack message, stand-up lead is ${currentLead.name} =====`);
+        res.send(`===== Sent slack message, stand-up lead is ${currentLead.name} =====`)
       })
       .catch((e) => {
         console.log(e.status);
       });
-  });
-};
+
+  } catch (err: any) {
+    res.status(500).send({ error: err.message })
+  }
+
+})
+
+// const scheduleTask = (): Job => {
+//   const rule = new schedule.RecurrenceRule();
+//   rule.hour = 8;
+//   rule.minute = 0;
+//   rule.dayOfWeek = new Range(1, 5);
+//   rule.tz = 'Australia/Melbourne';
+//   return schedule.scheduleJob(rule, () => {
+//     // rotate the lead on Monday
+//     const today = new Date();
+//     if (today.getDay() === 1) {
+//       rotateLead(nextLeadIndex);
+//     }
+
+//     const currentLead = rosterMembers[currentLeadIndex];
+//     const nextLead = rosterMembers[nextLeadIndex];
+//     // post the lead and next info to Slack!
+//     axios
+//       .post(SLACK_WEBHOOK_URL!, {
+//         standup_lead: currentLead.slackID,
+//         next: nextLead.slackID,
+//       })
+//       .then((response) => {
+//         console.log(`===== Sent slack message, stand-up lead is ${currentLead.name} =====`);
+//       })
+//       .catch((e) => {
+//         console.log(e.status);
+//       });
+//   });
+// };
