@@ -8,7 +8,7 @@ interface Duty {
 }
 
 const FILE = {
-  Bucket: 'cyclic-real-pink-cockroach-gear-ap-southeast-2',
+  Bucket: process.env.S3_BUCKET_NAME || '',
   Key: 'duty.json',
 };
 

@@ -4,7 +4,6 @@ import axios from 'axios';
 import path from 'path';
 import { TeamMember } from './interfaces';
 import express from 'express';
-import fs from 'fs';
 import { writeDutyFile, readDutyFile } from './helper/s3Bucket';
 
 require('dotenv').config({ path: path.resolve(__dirname, '../.env') });
@@ -36,51 +35,6 @@ const writeRoaster = async (current: number, next: number) => {
     throw err;
   }
 };
-
-app.listen(3000, async () => {
-  await readRoaster();
-  console.log('===== App starts =====');
-  scheduleTask();
-  console.log('===== Schedule Task =====');
-});
-
-app.get('/api/all-team-member', (req, res) => {
-  res.send(roster);
-});
-
-app.get('/api/current-lead', (req, res) => {
-  res.send(rosterMembers[currentLeadIndex]?.name);
-});
-
-app.get('/api/next-lead', (req, res) => {
-  res.send(rosterMembers[nextLeadIndex]?.name);
-});
-
-app.post('/api/lead/:id', (req, res) => {
-  try {
-    const leadIndex = parseInt(req.params.id as string);
-    if (leadIndex > rosterMembers.length - 1) {
-      res.send({ error: 'Lead Index is greater than the number of team member in ocean' });
-    }
-    rotateLead(leadIndex);
-    const message = `The current lead is updated to ${rosterMembers[currentLeadIndex]?.name}`;
-    console.log(`===== ${message} =====`);
-    res.send(message);
-  } catch (err: any) {
-    res.status(500).send({ error: err.message });
-  }
-});
-
-app.post('/api/lead/next', (req, res) => {
-  try {
-    rotateLead(nextLeadIndex);
-    const message = `The current lead is updated to ${rosterMembers[nextLeadIndex].name}`;
-    console.log(`===== ${message} =====`);
-    res.send(message);
-  } catch (err: any) {
-    res.status(500).send({ error: err.message });
-  }
-});
 
 const rotateLead = (newLeadIndex: number) => {
   currentLeadIndex = newLeadIndex || nextLeadIndex;
@@ -119,3 +73,53 @@ const scheduleTask = (): Job => {
       });
   });
 };
+
+app.get('/api/all-team-member', (req, res) => {
+  res.send(roster);
+});
+
+app.get('/api/current-lead', (req, res) => {
+  res.send(rosterMembers[currentLeadIndex]?.name);
+});
+
+app.get('/api/duty', async (req, res) => {
+  const rawJson = await readDutyFile();
+  res.send(rawJson);
+});
+
+app.get('/api/next-lead', (req, res) => {
+  res.send(rosterMembers[nextLeadIndex]?.name);
+});
+
+app.post('/api/lead/:id', (req, res) => {
+  try {
+    const leadIndex = parseInt(req.params.id as string);
+    if (leadIndex > rosterMembers.length - 1) {
+      res.send({ error: 'Lead Index is greater than the number of team member in ocean' });
+    }
+    rotateLead(leadIndex);
+    const message = `The current lead is updated to ${rosterMembers[currentLeadIndex]?.name}`;
+    console.log(`===== ${message} =====`);
+    res.send(message);
+  } catch (err: any) {
+    res.status(500).send({ error: err.message });
+  }
+});
+
+app.post('/api/lead/next', (req, res) => {
+  try {
+    rotateLead(nextLeadIndex);
+    const message = `The current lead is updated to ${rosterMembers[nextLeadIndex].name}`;
+    console.log(`===== ${message} =====`);
+    res.send(message);
+  } catch (err: any) {
+    res.status(500).send({ error: err.message });
+  }
+});
+
+app.listen(3000, async () => {
+  await readRoaster();
+  console.log('===== App starts =====');
+  scheduleTask();
+  console.log('===== Schedule Task =====');
+});
