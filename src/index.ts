@@ -5,6 +5,7 @@ import path from 'path';
 import { TeamMember } from './interfaces';
 import express from 'express';
 import fs from 'fs';
+import { writeDutyFile, readDutyFile } from './helper/s3Bucket';
 
 require('dotenv').config({ path: path.resolve(__dirname, '../.env') });
 
@@ -19,19 +20,18 @@ let currentLeadIndex: number;
 let nextLeadIndex: number;
 
 const readRoaster = async () => {
-  const rawData = await fs.readFileSync(path.resolve(__dirname, '../duty.json'));
-  const rawJson = JSON.parse(rawData.toString());
+  const rawJson = await readDutyFile();
   currentLeadIndex = rawJson.current;
   nextLeadIndex = rawJson.next;
 };
 
-const writeRoaster = (current: number, next: number) => {
+const writeRoaster = async (current: number, next: number) => {
   const newDuty = {
     current,
     next,
   };
   try {
-    fs.writeFileSync(path.resolve(__dirname, '../duty.json'), JSON.stringify(newDuty), 'utf-8');
+    await writeDutyFile(newDuty);
   } catch (err) {
     throw err;
   }
@@ -82,10 +82,12 @@ app.post('/api/lead/next', (req, res) => {
   }
 });
 
-const rotateLead = (newLeadIndex: number): void => {
+const rotateLead = (newLeadIndex: number) => {
   currentLeadIndex = newLeadIndex || nextLeadIndex;
   nextLeadIndex = (currentLeadIndex + 1) % rosterMembers.length;
-  // writeRoaster(currentLeadIndex, newLeadIndex);
+  writeRoaster(currentLeadIndex, newLeadIndex).then(() => {
+    console.log('wrote file');
+  });
 };
 
 const scheduleTask = (): Job => {
