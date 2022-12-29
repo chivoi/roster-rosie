@@ -33,7 +33,7 @@ const writeRoaster = (current: number, next: number) => {
   try {
     fs.writeFileSync(path.resolve(__dirname, '../duty.json'), JSON.stringify(newDuty), 'utf-8');
   } catch (err) {
-    throw err
+    throw err;
   }
 };
 
@@ -90,8 +90,8 @@ const rotateLead = (newLeadIndex: number): void => {
 
 const scheduleTask = (): Job => {
   const rule = new schedule.RecurrenceRule();
-  rule.hour = 8;
-  rule.minute = 0;
+  rule.hour = 10;
+  rule.minute = 16;
   rule.dayOfWeek = new Range(1, 5);
   rule.tz = 'Australia/Melbourne';
   return schedule.scheduleJob(rule, () => {
