@@ -8,7 +8,7 @@ interface Duty {
 }
 
 const FILE = {
-  Bucket: 'ocean-roaster',
+  Bucket: 'cyclic-real-pink-cockroach-gear-ap-southeast-2',
   Key: 'duty.json',
 };
 
