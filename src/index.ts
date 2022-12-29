@@ -101,8 +101,13 @@ app.post('/api/message-slack', (req, res) => {
         next: nextLead.slackID,
       })
       .then((response) => {
-        console.log(`===== Sent slack message, stand-up lead is ${currentLead.name} =====`);
         res.send(`===== Sent slack message, stand-up lead is ${currentLead.name} =====`)
+        // rotate the lead
+        const today = new Date();
+
+        if (today.getDay() === 5) {
+          rotateLead(nextLeadIndex);
+        }
       })
       .catch((e) => {
         console.log(e.status);
