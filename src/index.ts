@@ -66,15 +66,26 @@ app.post('/api/lead/:id', (req, res) => {
     const message = `The current lead is updated to ${rosterMembers[currentLeadIndex]?.name}`;
     console.log(`===== ${message} =====`);
     res.send(message);
-  } catch (err) {
-    res.status(500).send({ error: 'Invalid lead index number' });
+  } catch (err: any) {
+    res.status(500).send({ error: err.message });
+  }
+});
+
+app.post('/api/lead/next', (req, res) => {
+  try {
+    rotateLead(nextLeadIndex);
+    const message = `The current lead is updated to ${rosterMembers[nextLeadIndex].name}`;
+    console.log(`===== ${message} =====`);
+    res.send(message);
+  } catch (err: any) {
+    res.status(500).send({ error: err.message });
   }
 });
 
 const rotateLead = (newLeadIndex: number): void => {
   currentLeadIndex = newLeadIndex || nextLeadIndex;
   nextLeadIndex = (currentLeadIndex + 1) % rosterMembers.length;
- // writeRoaster(currentLeadIndex, newLeadIndex);
+  // writeRoaster(currentLeadIndex, newLeadIndex);
 };
 
 const scheduleTask = (): Job => {
