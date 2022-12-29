@@ -30,7 +30,11 @@ const writeRoaster = (current: number, next: number) => {
     current,
     next,
   };
-  fs.writeFileSync(path.resolve(__dirname, '../duty.json'), JSON.stringify(newDuty), 'utf-8');
+  try {
+    fs.writeFileSync(path.resolve(__dirname, '../duty.json'), JSON.stringify(newDuty), 'utf-8');
+  } catch (err) {
+    throw err
+  }
 };
 
 app.listen(3000, async () => {
@@ -54,8 +58,6 @@ app.get('/api/next-lead', (req, res) => {
 
 app.post('/api/lead/:id', (req, res) => {
   try {
-    console.log(req.params.id);
-    console.log(typeof req.params.id);
     const leadIndex = parseInt(req.params.id as string);
     if (leadIndex > rosterMembers.length - 1) {
       res.send({ error: 'Lead Index is greater than the number of team member in ocean' });
@@ -72,7 +74,7 @@ app.post('/api/lead/:id', (req, res) => {
 const rotateLead = (newLeadIndex: number): void => {
   currentLeadIndex = newLeadIndex || nextLeadIndex;
   nextLeadIndex = (currentLeadIndex + 1) % rosterMembers.length;
-  writeRoaster(currentLeadIndex, newLeadIndex);
+ // writeRoaster(currentLeadIndex, newLeadIndex);
 };
 
 const scheduleTask = (): Job => {
