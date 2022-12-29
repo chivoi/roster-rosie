@@ -8,9 +8,9 @@ import fs from 'fs';
 
 require('dotenv').config({ path: path.resolve(__dirname, '../.env') });
 
-const SLACK_WEBHOOK_URL: string | undefined = process.env.WEBHOOK_URL;
+const SLACK_WEBHOOK_URL = process.env.WEBHOOK_URL;
 if (!SLACK_WEBHOOK_URL) {
-  throw new Error('Failed to load env config');
+  console.warn('Failed to load env config');
 }
 
 const app = express();
@@ -90,7 +90,7 @@ const scheduleTask = (): Job => {
     const nextLead = rosterMembers[nextLeadIndex];
     // post the lead and next info to Slack!
     axios
-      .post(SLACK_WEBHOOK_URL, {
+      .post(SLACK_WEBHOOK_URL!, {
         standup_lead: currentLead.slackID,
         next: nextLead.slackID,
       })
