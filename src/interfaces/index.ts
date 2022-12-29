@@ -1,4 +1,4 @@
 export interface TeamMember {
-    name: string,
-    slackID: string
+  name: string;
+  slackID: string;
 }
