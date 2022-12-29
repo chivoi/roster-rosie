@@ -1,5 +1,5 @@
 import roster from './files/ocean-roster.json';
-import schedule, { Job } from 'node-schedule';
+import schedule, { Job, Range } from 'node-schedule';
 import axios from 'axios';
 import path from 'path';
 import { TeamMember } from './interfaces';
@@ -59,6 +59,7 @@ const scheduleTask = (): Job => {
   const rule = new schedule.RecurrenceRule();
   rule.hour = 8;
   rule.minute = 0;
+  rule.dayOfWeek = new Range(1, 5);
   rule.tz = 'Australia/Melbourne';
   return schedule.scheduleJob(rule, () => {
     // rotate the lead on Monday
@@ -76,7 +77,7 @@ const scheduleTask = (): Job => {
         next: nextLead.slackID,
       })
       .then((response) => {
-        console.log(response.status);
+        console.log(`===== Sent slack message, stand-up lead is ${currentLead.name} =====`);
       })
       .catch((e) => {
         console.log(e.status);
