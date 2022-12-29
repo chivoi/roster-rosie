@@ -4,6 +4,7 @@ import axios from 'axios';
 import path from 'path';
 import { TeamMember } from './interfaces';
 import express from 'express';
+import fs from 'fs';
 
 require('dotenv').config({ path: path.resolve(__dirname, '../.env') });
 
@@ -14,10 +15,26 @@ if (!SLACK_WEBHOOK_URL) {
 
 const app = express();
 const rosterMembers: TeamMember[] = roster.members;
-let currentLeadIndex: number = 0;
-let nextLeadIndex: number = 1;
+let currentLeadIndex: number;
+let nextLeadIndex: number;
 
-app.listen(3000, () => {
+const readRoaster = async () => {
+  const rawData = await fs.readFileSync(path.resolve(__dirname, '../duty.json'));
+  const rawJson = JSON.parse(rawData.toString());
+  currentLeadIndex = rawJson.current;
+  nextLeadIndex = rawJson.next;
+};
+
+const writeRoaster = (current: number, next: number) => {
+  const newDuty = {
+    current,
+    next,
+  };
+  fs.writeFileSync(path.resolve(__dirname, '../duty.json'), JSON.stringify(newDuty), 'utf-8');
+};
+
+app.listen(3000, async () => {
+  await readRoaster();
   console.log('===== App starts =====');
   scheduleTask();
   console.log('===== Schedule Task =====');
@@ -53,6 +70,7 @@ app.post('/api/lead/:id', (req, res) => {
 const rotateLead = (newLeadIndex: number): void => {
   currentLeadIndex = newLeadIndex || nextLeadIndex;
   nextLeadIndex = (currentLeadIndex + 1) % rosterMembers.length;
+  writeRoaster(currentLeadIndex, newLeadIndex);
 };
 
 const scheduleTask = (): Job => {
