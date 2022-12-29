@@ -70,7 +70,7 @@ const scheduleTask = (): Job => {
 
     const currentLead = rosterMembers[currentLeadIndex];
     const nextLead = rosterMembers[nextLeadIndex];
-    // post the lead and next info to Slack
+    // post the lead and next info to Slack!
     axios
       .post(SLACK_WEBHOOK_URL, {
         standup_lead: currentLead.slackID,
