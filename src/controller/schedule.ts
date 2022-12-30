@@ -1,6 +1,6 @@
 import schedule, { Job, Range } from 'node-schedule';
 import { rotateLead } from './member';
-import axios from 'axios/index';
+import axios from 'axios';
 import { TeamMember } from '../interfaces';
 import roster from '../files/ocean-roster.json';
 import { readDutyFile } from '../helper/s3Bucket';
@@ -15,7 +15,7 @@ const RULE = {
   ROTATE_DAY: 1,
 };
 
-export const scheduleTask = (): Job => {
+const scheduleTask = (): Job => {
   const rule = new schedule.RecurrenceRule();
   rule.hour = RULE.HOUR;
   rule.minute = RULE.MINUTE;
@@ -45,3 +45,5 @@ export const scheduleTask = (): Job => {
       });
   });
 };
+
+export { scheduleTask };
