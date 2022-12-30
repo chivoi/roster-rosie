@@ -48,10 +48,11 @@ const updateLeadByIndex = async (req: Request, res: Response) => {
 const updateNextLead = async (req: Request, res: Response) => {
   try {
     const { next } = await readDutyFile();
-    const nextIndex = parseInt(next)
-    await rotateLead(nextIndex);
-    const message = `The current lead is updated to ${rosterMembers[nextIndex].name}`;
-    console.log(`===== ${message} =====`);
+    console.log(`===== next is ${next} ====`);
+    await rotateLead(parseInt(next));
+    console.log(`===== next type is ${typeof next} ====`);
+    const message = `===== The current lead is updated to ${rosterMembers[next].name} ===== xxxxxxxxxx`;
+    console.log(message);
     res.send(message);
   } catch (err: any) {
     res.status(500).send({ error: err.message });
