@@ -7,17 +7,25 @@ import { readDutyFile } from '../helper/s3Bucket';
 
 const rosterMembers: TeamMember[] = roster.members;
 
+const RULE = {
+  HOUR: 10,
+  MINUTE: 16,
+  RANGE: new Range(1, 5),
+  TZ: 'Australia/Melbourne',
+  ROTATE_DAY: 1,
+};
+
 export const scheduleTask = (): Job => {
   const rule = new schedule.RecurrenceRule();
-  rule.hour = 10;
-  rule.minute = 16;
-  rule.dayOfWeek = new Range(1, 5);
-  rule.tz = 'Australia/Melbourne';
+  rule.hour = RULE.HOUR;
+  rule.minute = RULE.MINUTE;
+  rule.dayOfWeek = RULE.RANGE;
+  rule.tz = RULE.TZ;
   return schedule.scheduleJob(rule, async () => {
     const { next, current } = await readDutyFile();
     // rotate the lead on Monday
     const today = new Date();
-    if (today.getDay() === 1) {
+    if (today.getDay() === RULE.ROTATE_DAY) {
       await rotateLead(next);
     }
 

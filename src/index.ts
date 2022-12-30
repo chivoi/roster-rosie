@@ -13,6 +13,6 @@ loadRoutes(app);
 
 app.listen(3000, async () => {
   console.log('===== App starts =====');
-  await scheduleTask;
+  await scheduleTask();
   console.log('===== Schedule Task =====');
 });
