@@ -49,7 +49,10 @@ const updateNextLead = async (req: Request, res: Response) => {
   try {
     const { next } = await readDutyFile();
     await rotateLead(next);
-    const message = `The current lead is updated to ${rosterMembers[next]?.name}`;
+    console.log(next);
+    console.log(typeof next);
+    console.log(rosterMembers[next]);
+    const message = `The current lead is updated to ${rosterMembers[next].name}`;
     console.log(`===== ${message} =====`);
     res.send(message);
   } catch (err: any) {

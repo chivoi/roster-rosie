@@ -21,6 +21,7 @@ export const readDutyFile = async () => {
       return { current: 0, next: 1 };
     }
   } catch (err) {
+    console.error(err);
     return { current: 0, next: 1 };
   }
 };
