@@ -15,16 +15,13 @@ const FILE = {
 export const readDutyFile = async () => {
   try {
     const s3File = await s3.getObject(FILE).promise();
-    console.log(s3File);
-    console.log(s3File.Body);
-    console.log(s3File.Body?.toString());
     if (s3File.Body) {
       return JSON.parse(s3File.Body?.toString());
     } else {
-      return { current: 0, next: 0 };
+      return { current: 0, next: 1 };
     }
   } catch (err) {
-    return { current: 0, next: 0 };
+    return { current: 0, next: 1 };
   }
 };
 
