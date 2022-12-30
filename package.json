@@ -13,7 +13,7 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "@types/express": "^4.17.15",
+    "aws-sdk": "^2.1285.0",
     "axios": "^1.2.1",
     "concurrently": "^7.6.0",
     "dotenv": "^16.0.3",
@@ -22,6 +22,8 @@
     "prettier": "^2.8.1"
   },
   "devDependencies": {
+    "@types/aws-sdk": "^2.7.0",
+    "@types/express": "^4.17.15",
     "@types/jest": "^29.2.4",
     "@types/node": "^18.11.17",
     "@types/node-schedule": "^2.1.0",
