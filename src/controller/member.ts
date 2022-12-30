@@ -49,9 +49,9 @@ const updateNextLead = async (req: Request, res: Response) => {
   try {
     const { next } = await readDutyFile();
     await rotateLead(next);
-    console.log(next);
-    console.log(typeof next);
-    console.log(rosterMembers[next]);
+    console.log('next is ' + next);
+    console.log('type of is ' + typeof next);
+    console.log('xxxxx' + rosterMembers[next]);
     const message = `The current lead is updated to ${rosterMembers[next].name}`;
     console.log(`===== ${message} =====`);
     res.send(message);
