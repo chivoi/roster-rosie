@@ -13,7 +13,7 @@ export const loadRoutes = (app: Express) => {
 
   app.post('/api/lead/:id', Member.updateLeadByIndex);
 
-  app.post('/api/lead/next', Member.updateNextLead);
+  app.post('/api/rotate-lead', Member.updateNextLead);
 
   app.post('/api/message-slack', Message.postSlackMessage);
 };
