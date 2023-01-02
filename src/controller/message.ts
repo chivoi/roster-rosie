@@ -11,9 +11,8 @@ export const postSlackMessage = async (req: Request, res: Response) => {
     // rotate the lead
     const today = new Date();
 
-    if (today.getDay() === 1) {
-      await rotateLead();
-    }
+    if (today.getDay() === 1) await rotateLead();
+    if (today.getDay() === 6 || today.getDay() === 7) return;
 
     const { current, next } = await readDutyFile();
     const currentLead = rosterMembers[current];
