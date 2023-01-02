@@ -5,6 +5,8 @@ const s3 = new S3();
 interface Duty {
   current: number;
   next: number;
+  retroCurrent: number;
+  retroNext: number;
 }
 
 const FILE = {
@@ -18,11 +20,11 @@ export const readDutyFile = async () => {
     if (s3File.Body) {
       return JSON.parse(s3File.Body?.toString());
     } else {
-      return { current: 0, next: 1 };
+      return { current: 0, next: 1, retroCurrent: 0, retroNext: 1 };
     }
   } catch (err) {
     console.error(err);
-    return { current: 0, next: 1 };
+    return { current: 0, next: 1, retroCurrent: 0, retroNext: 1 };
   }
 };
 
