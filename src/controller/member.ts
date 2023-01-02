@@ -2,7 +2,7 @@ import { Request, Response } from 'express';
 import roster from '../files/ocean-roster.json';
 import { readDutyFile, writeDutyFile } from '../helper/s3Bucket';
 
-const rosterMembers = roster.members;
+const rosterMembers = roster.members
 
 const rotateLead = async (newLeadIndex?: number) => {
   const { next } = await readDutyFile();
