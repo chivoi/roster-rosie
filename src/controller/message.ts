@@ -3,20 +3,25 @@ import roster from '../files/ocean-roster.json';
 import { readDutyFile } from '../helper/s3Bucket';
 import axios from 'axios';
 import { rotateLead } from './member';
+import { Event } from "../interfaces"
 
 const rosterMembers = roster.members;
 
 export const postSlackMessage = async (req: Request, res: Response) => {
   try {
-    const { current, next } = await readDutyFile();
+    const { event } = req.params;
+    const { current, next } = await readDutyFile(req.params.event);
     const currentLead = rosterMembers[current];
     const nextLead = rosterMembers[next];
 
     axios
-      .post(process.env.SLACK_WEBHOOK_URL!, {
-        standup_lead: currentLead.slackID,
-        next: nextLead.slackID,
-      })
+      .post(event === (Event.standup as string)
+        ? process.env.SLACK_WEBHOOK_URL!
+        : process.env.RETRO_SLACK_WEBHOOK_URL!,
+        {
+          current: currentLead.slackID,
+          next: nextLead.slackID,
+        })
       .then(async () => {
         res.send(`===== Sent slack message, stand-up lead is ${currentLead.name} =====`);
       })
@@ -32,27 +37,3 @@ export const postSlackMessage = async (req: Request, res: Response) => {
   if (today.getDay() === 4) await rotateLead();
 
 };
-
-export const postSlackMessageRetro = async (req: Request, res: Response) => {
-  try {
-    // rotate retro lead on Tuesday
-    const { retroCurrent, retroNext } = await readDutyFile();
-    const currentLead = rosterMembers[retroCurrent];
-    const nextLead = rosterMembers[retroNext];
-
-    axios
-      .post(process.env.RETRO_SLACK_WEBHOOK_URL!, {
-        retroLead: currentLead.slackID,
-        next: nextLead.slackID,
-      })
-      .then(async () => {
-        res.send(`===== Sent slack message, retro/sprint review lead is ${currentLead.name} =====`);
-        rotateLead(retroNext, 1)
-      })
-      .catch((e) => {
-        console.log(e.status);
-      });
-  } catch (err: any) {
-    res.status(500).send({ error: err.message });
-  }
-}

@@ -3,7 +3,7 @@ export interface TeamMember {
   slackID: string;
 }
 
-export enum Ceremony {
-  standup,
-  retro
+export enum Event {
+  standup = "standup",
+  retro = "retro"
 }
