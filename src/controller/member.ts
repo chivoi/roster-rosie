@@ -11,11 +11,15 @@ const rotateLead = async (newLeadIndex?: number, ceremony?: Ceremony) => {
   if (ceremony === 1) { // if it's a retro
     const newRetroCurrent = newLeadIndex || retroNext;
     const newRetroNext = (newRetroCurrent + 1) % rosterMembers.length;
-    dutyObject = { newRetroCurrent, newRetroNext, ...dutyObject };
+    dutyObject = {
+      retroCurrent: newRetroCurrent,
+      retroNext: newRetroNext,
+      ...dutyObject
+    };
   } else { // if no ceremony specified, the default is standup
     const newCurrent = newLeadIndex || next;
     const newNext = (newCurrent + 1) % rosterMembers.length;
-    dutyObject = { newCurrent, newNext, ...dutyObject };
+    dutyObject = { current: newCurrent, next: newNext, ...dutyObject };
   }
   // @TODO retro POST routes don't work cause it is failing somewhere here I think.
   await writeDutyFile(dutyObject);
