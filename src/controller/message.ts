@@ -41,8 +41,8 @@ export const postSlackMessageRetro = async (req: Request, res: Response) => {
     const nextLead = rosterMembers[retroNext];
 
     axios
-      .post(process.env.SLACK_WEBHOOK_URL!, {
-        standup_lead: currentLead.slackID,
+      .post(process.env.RETRO_SLACK_WEBHOOK_URL!, {
+        retroLead: currentLead.slackID,
         next: nextLead.slackID,
       })
       .then(async () => {

@@ -21,7 +21,6 @@ const rotateLead = async (newLeadIndex?: number, ceremony?: Ceremony) => {
     const newNext = (newCurrent + 1) % rosterMembers.length;
     dutyObject = { current: newCurrent, next: newNext, ...dutyObject };
   }
-  // @TODO retro POST routes don't work cause it is failing somewhere here I think.
   await writeDutyFile(dutyObject);
 };
 
