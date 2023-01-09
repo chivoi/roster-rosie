@@ -8,11 +8,6 @@ const rosterMembers = roster.members;
 
 export const postSlackMessage = async (req: Request, res: Response) => {
   try {
-    // rotate the lead
-    const today = new Date();
-
-    if (today.getDay() === 1) await rotateLead();
-
     const { current, next } = await readDutyFile();
     const currentLead = rosterMembers[current];
     const nextLead = rosterMembers[next];
@@ -31,4 +26,9 @@ export const postSlackMessage = async (req: Request, res: Response) => {
   } catch (err: any) {
     res.status(500).send({ error: err.message });
   }
+
+  // rotate the lead after posting on Friday
+  const today = new Date();
+  if (today.getDay() === 5) await rotateLead();
+
 };
