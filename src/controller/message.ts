@@ -27,8 +27,8 @@ export const postSlackMessage = async (req: Request, res: Response) => {
     res.status(500).send({ error: err.message });
   }
 
-  // rotate the lead after posting on Friday
+  // rotate the lead after posting on Thursday, cause cyclic.sh TZ is likely UTC
   const today = new Date();
-  if (today.getDay() === 5) await rotateLead();
+  if (today.getDay() === 4) await rotateLead();
 
 };
