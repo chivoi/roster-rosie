@@ -8,9 +8,9 @@ import { Event } from "../interfaces"
 const rosterMembers = roster.members;
 
 export const postSlackMessage = async (req: Request, res: Response) => {
+  const { event } = req.params;
   try {
-    const { event } = req.params;
-    const { current, next } = await readDutyFile(req.params.event);
+    const { current, next } = await readDutyFile(event);
     const currentLead = rosterMembers[current];
     const nextLead = rosterMembers[next];
 
@@ -23,7 +23,7 @@ export const postSlackMessage = async (req: Request, res: Response) => {
           next: nextLead.slackID,
         })
       .then(async () => {
-        res.send(`===== Sent slack message, stand-up lead is ${currentLead.name} =====`);
+        res.send(`===== Sent slack message, ${event} lead is ${currentLead.name} =====`);
       })
       .catch((e) => {
         console.log(e.status);
@@ -31,9 +31,9 @@ export const postSlackMessage = async (req: Request, res: Response) => {
   } catch (err: any) {
     res.status(500).send({ error: err.message });
   }
-
-  // rotate the lead after posting on Thursday, cause cyclic.sh TZ is likely UTC
   const today = new Date();
-  if (today.getDay() === 4) await rotateLead();
+  // rotate the lead after posting on Thursday/Monday, cause cyclic.sh TZ is likely UTC
+  if (today.getDay() === 4 && event === (Event.standup as string)) await rotateLead(event);
+  if (today.getDay() === 1 && event === (Event.retro as string)) await rotateLead(event);
 
 };
