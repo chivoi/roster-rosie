@@ -13,7 +13,7 @@ interface Duty {
 
 export const readDutyFile = async (filename: string) => {
   try {
-    console.log("Bucki ", process.env.S3_BUCKET_NAME)
+    console.log("Reading this file ", filename)
     const s3File = await s3.getObject({
       Bucket: process.env.S3_BUCKET_NAME || '',
       Key: `${filename}.json`,
