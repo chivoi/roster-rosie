@@ -1,7 +1,7 @@
 import path from 'path';
 import express from 'express';
 import { loadRoutes } from './routes';
-import { validateEnv } from './helper/validateEnv';
+import { validateEnv } from './helper/validator';
 
 require('dotenv').config({ path: path.resolve(__dirname, '../.env') });
 

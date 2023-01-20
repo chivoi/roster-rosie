@@ -4,11 +4,15 @@ import { readDutyFile, writeDutyFile } from '../helper/s3Bucket';
 
 const rosterMembers = roster.members
 
-const rotateLead = async (newLeadIndex?: number) => {
-  const { next } = await readDutyFile();
+const rotateLead = async (event: string, newLeadIndex?: number) => {
+  let dutyObject = await readDutyFile(event);
+  const { next } = dutyObject;
+
   const newCurrent = newLeadIndex || next;
   const newNext = (newCurrent + 1) % rosterMembers.length;
-  await writeDutyFile({ current: newCurrent, next: newNext });
+  dutyObject = { current: newCurrent, next: newNext };
+
+  await writeDutyFile(dutyObject, event);
 };
 
 const getAllMembers = (req: Request, res: Response) => {
@@ -16,17 +20,20 @@ const getAllMembers = (req: Request, res: Response) => {
 };
 
 const getCurrentLead = async (req: Request, res: Response) => {
-  const { current } = await readDutyFile();
+  const { event } = req.params;
+  const { current } = await readDutyFile(event);
   res.send(rosterMembers[current]?.name);
 };
 
 const getDuty = async (req: Request, res: Response) => {
-  const rawJson = await readDutyFile();
+  const { event } = req.params;
+  const rawJson = await readDutyFile(event);
   res.send(rawJson);
 };
 
 const getNextLead = async (req: Request, res: Response) => {
-  const { next } = await readDutyFile();
+  const { event } = req.params;
+  const { next } = await readDutyFile(event);
   res.send(rosterMembers[next]?.name);
 };
 
@@ -36,7 +43,7 @@ const updateLeadByIndex = async (req: Request, res: Response) => {
     if (leadIndex > rosterMembers.length - 1) {
       res.send({ error: 'Lead Index is greater than the number of team member in ocean' });
     }
-    await rotateLead(leadIndex);
+    await rotateLead(req.params.event, leadIndex);
     const message = `The current lead is updated to ${rosterMembers[leadIndex]?.name}`;
     console.log(`===== ${message} =====`);
     res.send(message);
@@ -47,8 +54,9 @@ const updateLeadByIndex = async (req: Request, res: Response) => {
 
 const updateNextLead = async (req: Request, res: Response) => {
   try {
-    const { next } = await readDutyFile();
-    await rotateLead(next);
+    const { event } = req.params;
+    const { next } = await readDutyFile(event);
+    await rotateLead(event, next);
     const message = `===== The current lead is updated to ${rosterMembers[next].name} =====`;
     console.log(message);
     res.send(message);
@@ -64,5 +72,5 @@ export {
   getDuty,
   getNextLead,
   updateLeadByIndex,
-  updateNextLead,
+  updateNextLead
 };
