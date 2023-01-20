@@ -26,7 +26,7 @@ export const postSlackMessage = async (req: Request, res: Response) => {
         res.send(`===== Sent slack message, ${event} lead is ${currentLead.name} =====`);
       })
       .catch((e) => {
-        console.log(e.status);
+        console.log(e);
       });
   } catch (err: any) {
     res.status(500).send({ error: err.message });
