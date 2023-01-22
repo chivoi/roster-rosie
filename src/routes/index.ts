@@ -1,7 +1,7 @@
 import { Express } from 'express';
 import * as Member from '../controller/member';
 import * as Message from '../controller/message';
-import { validateEventType } from '../helper/validator';
+import { isThisRetroDay, validateEventType } from '../helper/validator';
 
 export const loadRoutes = (app: Express) => {
   app.get('/api/all-team-member', Member.getAllMembers);
@@ -16,5 +16,5 @@ export const loadRoutes = (app: Express) => {
 
   app.post('/api/rotate-lead/:event', validateEventType, Member.updateNextLead);
 
-  app.post('/api/message-slack/:event', validateEventType, Message.postSlackMessage);
+  app.post('/api/message-slack/:event', validateEventType, isThisRetroDay, Message.postSlackMessage);
 };
