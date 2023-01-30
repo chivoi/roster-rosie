@@ -1,7 +1,7 @@
 import { NextFunction, Request, Response } from "express";
 import { Event } from "../interfaces";
 
-let TUESDAY_COUNTER = 0;
+let TUESDAY_COUNTER = 1;
 
 export const validateEnv = () => {
   const SLACK_WEBHOOK_URL = process.env.SLACK_WEBHOOK_URL;
