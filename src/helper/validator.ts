@@ -34,6 +34,7 @@ export const isThisRetroDay = (req: Request, res: Response, next: NextFunction) 
     next();
   } else {
     TUESDAY_COUNTER = 1;
-    return;
+    res.send("Not posting to Slack, because it's not sprint review/retro Tuesday")
+
   }
 }
