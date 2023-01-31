@@ -1,7 +1,10 @@
 import { NextFunction, Request, Response } from "express";
 import { Event } from "../interfaces";
+import tuesdayCount from '../files/tuesday-count.json';
+import { writeFile } from "fs";
 
-let TUESDAY_COUNTER = 1;
+const path = './src/files/tuesday-count.json';
+
 
 export const validateEnv = () => {
   const SLACK_WEBHOOK_URL = process.env.SLACK_WEBHOOK_URL;
@@ -27,14 +30,34 @@ export const isThisRetroDay = (req: Request, res: Response, next: NextFunction) 
   const { event } = req.params;
   const today = new Date();
   // 1 || 2 is to account for both UTC and AEST
-  if ((today.getDay() !== (1 || 2)) || (event !== Event.retro as string)) next();
-
-  if (TUESDAY_COUNTER) {
-    TUESDAY_COUNTER = 0;
+  if ((event !== Event.retro as string) || (today.getDay() !== (1 || 2))) {
+    console.log("It's not Tuesday or not retro day. Going to the next function")
     next();
-  } else {
-    TUESDAY_COUNTER = 1;
-    res.send("Not posting to Slack, because it's not sprint review/retro Tuesday")
+  }
 
+  if (tuesdayCount) {
+    const newTuesdayCount = {
+      "count": 0
+    };
+    try {
+      writeFile(path, JSON.stringify(newTuesdayCount, null, 2), () => {
+        console.log("Updated Tuesday count");
+      });
+      next();
+    } catch {
+      res.status(400).send("Could not update Tuesday count")
+    }
+  } else {
+    const newTuesdayCount = {
+      "count": 1
+    };
+    try {
+      writeFile(path, JSON.stringify(newTuesdayCount, null, 2), () => {
+        console.log("Updated Tuesday count");
+      });
+      res.send("Not posting to Slack, because it's not sprint review/retro Tuesday")
+    } catch {
+      res.status(400).send("Could not update Tuesday count")
+    }
   }
 }
