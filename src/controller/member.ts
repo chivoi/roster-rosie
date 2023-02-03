@@ -1,6 +1,6 @@
 import { Request, Response } from 'express';
 import roster from '../files/ocean-roster.json';
-import { readDutyFile, writeDutyFile } from '../helper/s3Bucket';
+import { readDutyFile, writeFile } from '../helper/s3Bucket';
 
 const rosterMembers = roster.members
 
@@ -12,7 +12,7 @@ const rotateLead = async (event: string, newLeadIndex?: number) => {
   const newNext = (newCurrent + 1) % rosterMembers.length;
   dutyObject = { current: newCurrent, next: newNext };
 
-  await writeDutyFile(dutyObject, event);
+  await writeFile(dutyObject, event);
 };
 
 const getAllMembers = (req: Request, res: Response) => {

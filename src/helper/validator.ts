@@ -1,10 +1,6 @@
 import { NextFunction, Request, Response } from "express";
 import { Event } from "../interfaces";
-import tuesdayCount from '../files/tuesday-count.json';
-import { writeFile } from "fs";
-
-const path = './src/files/tuesday-count.json';
-
+import { readTuesdayCountFile, writeFile } from './s3Bucket';
 
 export const validateEnv = () => {
   const SLACK_WEBHOOK_URL = process.env.SLACK_WEBHOOK_URL;
@@ -26,9 +22,11 @@ export const validateEventType = (req: Request, res: Response, next: NextFunctio
   };
 }
 
-export const isThisRetroDay = (req: Request, res: Response, next: NextFunction) => {
+export const isThisRetroDay = async (req: Request, res: Response, next: NextFunction) => {
   const { event } = req.params;
   const today = new Date();
+  let tuesdayCount = await readTuesdayCountFile();
+
   // 1 || 2 is to account for both UTC and AEST
   if (event == Event.standup as string) {
     res.send("Posting standup lead to Slack")
@@ -38,28 +36,28 @@ export const isThisRetroDay = (req: Request, res: Response, next: NextFunction) 
     console.log("Tuesday count count: " + tuesdayCount.count)
 
     const newTuesdayCount = { "count": 0 };
-    writeFile(path, JSON.stringify(newTuesdayCount, null, 2), (err) => {
-      if (err) {
-        console.log("Could not update Tuesday count")
-        console.log(err)
-      } else {
-        console.log("Updated Tuesday count: ", JSON.stringify(newTuesdayCount));
-      }
-    });
-    next();
+    try {
+      await writeFile(newTuesdayCount, 'tuesday-count');
+      console.log("These are contents of the file now")
+      console.log(JSON.stringify(await readTuesdayCountFile()))
+      next();
+    } catch (e) {
+      res.send("Tuesday count file didn't write")
+      console.log(e)
+    }
   } else if (!tuesdayCount.count) {
     console.log("Tuesday count before: " + JSON.stringify(tuesdayCount))
     console.log("Tuesday count count: " + tuesdayCount.count)
 
     const newTuesdayCount = { "count": 1 };
-    writeFile(path, JSON.stringify(newTuesdayCount, null, 2), (err) => {
-      if (err) {
-        console.log("Could not update Tuesday count")
-        console.log(err)
-      } else {
-        console.log("Updated Tuesday count: ", JSON.stringify(newTuesdayCount));
-      }
-    });
-    res.send("Not posting to Slack, because it's not sprint review/retro Tuesday")
+    try {
+      await writeFile(newTuesdayCount, 'tuesday-count')
+      console.log("These are contents of the file now")
+      console.log(JSON.stringify(await readTuesdayCountFile()))
+      res.send("Not posting to Slack, because it's not sprint review/retro Tuesday")
+    } catch (e) {
+      res.send("Tuesday count file didn't write")
+      console.log(e)
+    }
   }
 }
