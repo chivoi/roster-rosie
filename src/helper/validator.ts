@@ -30,34 +30,36 @@ export const isThisRetroDay = (req: Request, res: Response, next: NextFunction) 
   const { event } = req.params;
   const today = new Date();
   // 1 || 2 is to account for both UTC and AEST
-  if ((event !== Event.retro as string) || (today.getDay() !== (1 || 2))) {
-    console.log("It's not Tuesday or not retro day. Going to the next function")
+  if (event == Event.standup as string) {
+    res.send("Posting standup lead to Slack")
     next();
-  }
+  } else if (tuesdayCount.count) {
+    console.log("Tuesday count before: " + JSON.stringify(tuesdayCount))
+    console.log("Tuesday count count: " + tuesdayCount.count)
 
-  if (tuesdayCount) {
-    const newTuesdayCount = {
-      "count": 0
-    };
-    try {
-      writeFile(path, JSON.stringify(newTuesdayCount, null, 2), () => {
-        console.log("Updated Tuesday count");
-      });
-      next();
-    } catch {
-      res.status(400).send("Could not update Tuesday count")
-    }
-  } else {
-    const newTuesdayCount = {
-      "count": 1
-    };
-    try {
-      writeFile(path, JSON.stringify(newTuesdayCount, null, 2), () => {
-        console.log("Updated Tuesday count");
-      });
-      res.send("Not posting to Slack, because it's not sprint review/retro Tuesday")
-    } catch {
-      res.status(400).send("Could not update Tuesday count")
-    }
+    const newTuesdayCount = { "count": 0 };
+    writeFile(path, JSON.stringify(newTuesdayCount, null, 2), (err) => {
+      if (err) {
+        console.log("Could not update Tuesday count")
+        console.log(err)
+      } else {
+        console.log("Updated Tuesday count: ", JSON.stringify(newTuesdayCount));
+      }
+    });
+    next();
+  } else if (!tuesdayCount.count) {
+    console.log("Tuesday count before: " + JSON.stringify(tuesdayCount))
+    console.log("Tuesday count count: " + tuesdayCount.count)
+
+    const newTuesdayCount = { "count": 1 };
+    writeFile(path, JSON.stringify(newTuesdayCount, null, 2), (err) => {
+      if (err) {
+        console.log("Could not update Tuesday count")
+        console.log(err)
+      } else {
+        console.log("Updated Tuesday count: ", JSON.stringify(newTuesdayCount));
+      }
+    });
+    res.send("Not posting to Slack, because it's not sprint review/retro Tuesday")
   }
 }

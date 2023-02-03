@@ -13,6 +13,7 @@ export const postSlackMessage = async (req: Request, res: Response) => {
     const { current, next } = await readDutyFile(event);
     const currentLead = rosterMembers[current];
     const nextLead = rosterMembers[next];
+    console.log(`Ok read file, about to post. CurrentLead is ${currentLead}, next is ${nextLead}`)
 
     axios
       .post(event === (Event.standup as string)
