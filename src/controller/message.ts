@@ -36,7 +36,7 @@ export const postSlackMessage = async (req: Request, res: Response) => {
   // rotate standup lead after posting on Thursday, cause cyclic.sh TZ is likely UTC
   // rotate retro lead every time this method is called with '/retro'
 
-  if ((today.getDay() === 4 && event === (Event.standup as string))
+  if ((today.getDay() === 3 && event === (Event.standup as string))
     || (event === (Event.retro as string))
   ) await rotateLead(event);
 };

@@ -1,6 +1,6 @@
 import { Request, Response } from 'express';
 import roster from '../files/ocean-roster.json';
-import { readDutyFile, writeFile } from '../helper/s3Bucket';
+import { readDutyFile, readTuesdayCountFile, writeFile } from '../helper/s3Bucket';
 
 const rosterMembers = roster.members
 
@@ -28,6 +28,11 @@ const getCurrentLead = async (req: Request, res: Response) => {
 const getDuty = async (req: Request, res: Response) => {
   const { event } = req.params;
   const rawJson = await readDutyFile(event);
+  res.send(rawJson);
+};
+
+const getTuesdayCount = async (req: Request, res: Response) => {
+  const rawJson = await readTuesdayCountFile();
   res.send(rawJson);
 };
 
@@ -72,5 +77,6 @@ export {
   getDuty,
   getNextLead,
   updateLeadByIndex,
-  updateNextLead
+  updateNextLead,
+  getTuesdayCount
 };
