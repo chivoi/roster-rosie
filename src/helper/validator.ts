@@ -48,8 +48,7 @@ export const isThisRetroDay = async (req: Request, res: Response, next: NextFunc
           // don't post, just send response
           res.send("Not posting to Slack, because it's not sprint review/retro Tuesday")
         } catch (e) {
-          res.send("Tuesday count file didn't write")
-          console.log(e)
+          res.send("Tuesday count file didn't write, because " + e)
         }
       }
     }
@@ -64,8 +63,7 @@ export const isThisRetroDay = async (req: Request, res: Response, next: NextFunc
         // Post to Slack
         next();
       } catch (e) {
-        res.send("Tuesday count file didn't write")
-        console.log(e)
+        res.send("Tuesday count file didn't write, because " + e)
       }
     }
   }
