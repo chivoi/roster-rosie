@@ -1,5 +1,5 @@
 import { NextFunction, Request, Response } from "express";
-import { Event } from "../interfaces";
+import { Event, TuesdayCount } from "../interfaces";
 import { readTuesdayCountFile, writeFile } from './s3Bucket';
 
 export const validateEnv = () => {
@@ -41,12 +41,10 @@ export const isThisRetroDay = async (req: Request, res: Response, next: NextFunc
         next();
       } else if (event == Event.retro as string) {
         // change Tuesday count to 1 to post next week
-        const newTuesdayCount = { "count": 1 };
+        const newTuesdayCount: TuesdayCount = { count: 1 };
         try {
           // write it into file
           await writeFile(newTuesdayCount, 'tuesday-count')
-          console.log("These are contents of the file now")
-          console.log(JSON.stringify(await readTuesdayCountFile()))
           // don't post, just send response
           res.send("Not posting to Slack, because it's not sprint review/retro Tuesday")
         } catch (e) {
@@ -59,12 +57,10 @@ export const isThisRetroDay = async (req: Request, res: Response, next: NextFunc
     // retro Tuesday - post retro, no post standup
     if (tuesdayCount.count) {
       // change Tuesday count to 0
-      const newTuesdayCount = { "count": 0 };
+      const newTuesdayCount: TuesdayCount = { count: 0 };
       // write it in file
       try {
         await writeFile(newTuesdayCount, 'tuesday-count');
-        console.log("These are contents of the Count file now")
-        console.log(JSON.stringify(await readTuesdayCountFile()))
         // Post to Slack
         next();
       } catch (e) {
