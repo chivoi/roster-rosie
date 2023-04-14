@@ -12,6 +12,8 @@ export const loadRoutes = (app: Express) => {
 
   app.get('/api/tuesdaycount', Member.getTuesdayCount);
 
+  app.post('/api/tuesdaycount/:id', Member.setTuesdayCount);
+
   app.get('/api/next-lead/:event', validateEventType, Member.getNextLead);
 
   app.post('/api/lead/:event/:id', validateEventType, Member.updateLeadByIndex);
