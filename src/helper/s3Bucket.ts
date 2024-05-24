@@ -1,19 +1,20 @@
 import { S3 } from 'aws-sdk';
 import path from 'path';
-import { Duty, TuesdayCount } from '../interfaces'
+import { Duty, TuesdayCount } from '../interfaces';
 
 require('dotenv').config({ path: path.resolve(__dirname, '../../.env') });
-
 
 const s3 = new S3();
 
 export const readDutyFile = async (filename: string) => {
   try {
-    console.log("Reading this file ", filename)
-    const s3File = await s3.getObject({
-      Bucket: process.env.S3_BUCKET_NAME || '',
-      Key: `${filename}.json`,
-    }).promise();
+    console.log('Reading this file ', filename);
+    const s3File = await s3
+      .getObject({
+        Bucket: process.env.S3_BUCKET_NAME || '',
+        Key: `${filename}.json`,
+      })
+      .promise();
     if (s3File.Body) {
       return JSON.parse(s3File.Body?.toString());
     } else {
@@ -37,11 +38,13 @@ export const writeFile = async (body: Duty | TuesdayCount, filename: string) => 
 
 export const readTuesdayCountFile = async () => {
   try {
-    console.log("Reading tuesday count file")
-    const s3File = await s3.getObject({
-      Bucket: process.env.S3_BUCKET_NAME || '',
-      Key: `tuesday-count.json`,
-    }).promise();
+    console.log('Reading tuesday count file');
+    const s3File = await s3
+      .getObject({
+        Bucket: process.env.S3_BUCKET_NAME || '',
+        Key: `tuesday-count.json`,
+      })
+      .promise();
     if (s3File.Body) {
       return JSON.parse(s3File.Body?.toString());
     } else {

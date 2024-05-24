@@ -1,0 +1,33 @@
+{
+    "version": 2,
+    "rewrites": [
+        {
+            "source": "/api/current-lead/:event",
+            "destination": "/api/current-lead"
+        },
+        {
+            "source": "/api/duty/:event",
+            "destination": "/api/duty"
+        },
+        {
+            "source": "/api/tuesdaycount/:id",
+            "destination": "/api/tuesdaycount"
+        },
+        {
+            "source": "/api/next-lead/:event",
+            "destination": "/api/next-lead"
+        },
+        {
+            "source": "/api/message-slack/:event",
+            "destination": "/api/message-slack"
+        },
+        {
+            "source": "/api/lead/:event/:id",
+            "destination": "/api/lead"
+        },
+        {
+            "source": "/api/rotate-lead/:event",
+            "destination": "/api/rotate-lead"
+        }
+    ]
+}

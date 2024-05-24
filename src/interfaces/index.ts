@@ -4,8 +4,8 @@ export interface TeamMember {
 }
 
 export enum Event {
-  standup = "standup",
-  retro = "retro"
+  standup = 'standup',
+  retro = 'retro',
 }
 
 export interface Duty {
@@ -16,3 +16,6 @@ export interface Duty {
 export interface TuesdayCount {
   count: number;
 }
+
+export type RequestHandlerWithParam<T> = (param: T) => Response | Promise<Response>;
+export type RequestHandler = () => Response | Promise<Response>;

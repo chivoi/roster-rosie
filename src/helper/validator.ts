@@ -1,5 +1,4 @@
-import { NextFunction, Request, Response } from "express";
-import { Event, TuesdayCount } from "../interfaces";
+import { Event, RequestHandler, RequestHandlerWithParam, TuesdayCount } from '../interfaces';
 import { readTuesdayCountFile, writeFile } from './s3Bucket';
 
 export const validateEnv = () => {
@@ -13,42 +12,51 @@ export const validateEnv = () => {
   return true;
 };
 
-export const validateEventType = (req: Request, res: Response, next: NextFunction) => {
-  const { event } = req.params;
-  if (Object.keys(Event).includes(event)) {
-    next()
+export const validateEventType = (req: Request, next: RequestHandlerWithParam<string>): Response | Promise<Response> => {
+  const event = new URL(req.url).searchParams.get('event');
+  if (event && Object.keys(Event).includes(event)) {
+    return next(event);
   } else {
-    res.status(400).send("Invalid event type. Valid types: retro or standup")
-  };
-}
+    return new Response('Invalid event type. Valid types: retro or standup', { status: 400 });
+  }
+};
 
-export const isThisRetroDay = async (req: Request, res: Response, next: NextFunction) => {
-  const { event } = req.params;
+export const validateNumberParam = (paramName: string, req: Request, next: RequestHandlerWithParam<number>): Response | Promise<Response> => {
+  const param = new URL(req.url).searchParams.get(paramName);
+  if (param !== null && param !== undefined && !isNaN(parseInt(param))) {
+    return next(parseInt(param));
+  } else {
+    return new Response('Invalid id', { status: 400 });
+  }
+};
+
+export const isThisRetroDay = async (req: Request, next: RequestHandler): Promise<Response> => {
+  const event = new URL(req.url).searchParams.get('event');
   let tuesdayCount = await readTuesdayCountFile();
   const today = new Date();
 
   // Any other day except Tuesday - post standup
-  if ((event == Event.standup as string) && (today.getDay() !== 1)) {
-    next();
+  if (event == (Event.standup as string) && today.getDay() !== 1) {
+    return next();
   }
 
   // Tuesdays (Monday in UTC)
   if (today.getDay() == 1) {
     // regular Tuesday - post standup, no post retro
     if (!tuesdayCount.count) {
-      if (event == Event.standup as string) {
-        console.log("Non-retro Tuesday, posting Standup lead")
-        next();
-      } else if (event == Event.retro as string) {
+      if (event == (Event.standup as string)) {
+        console.log('Non-retro Tuesday, posting Standup lead');
+        return next();
+      } else if (event == (Event.retro as string)) {
         // change Tuesday count to 1 to post next week
         const newTuesdayCount: TuesdayCount = { count: 1 };
         try {
           // write it into file
-          await writeFile(newTuesdayCount, 'tuesday-count')
+          await writeFile(newTuesdayCount, 'tuesday-count');
           // don't post, just send response
-          res.send("Not posting to Slack, because it's not sprint review/retro Tuesday")
+          return new Response("Not posting to Slack, because it's not sprint review/retro Tuesday");
         } catch (e) {
-          res.send("Tuesday count file didn't write, because " + e)
+          return new Response("Tuesday count file didn't write, because " + e);
         }
       }
     }
@@ -61,10 +69,12 @@ export const isThisRetroDay = async (req: Request, res: Response, next: NextFunc
       try {
         await writeFile(newTuesdayCount, 'tuesday-count');
         // Post to Slack
-        next();
+        return next();
       } catch (e) {
-        res.send("Tuesday count file didn't write, because " + e)
+        return new Response("Tuesday count file didn't write, because " + e);
       }
     }
   }
-}
+
+  return new Response('Who knows?', { status: 500 });
+};
