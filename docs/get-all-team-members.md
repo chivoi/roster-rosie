@@ -1,7 +1,9 @@
 # Get all team members
 
+This endpoint is called to display all [Team Members](https://github.com/chivoi/roster-rosie/wiki/Resources-&-Definitions#team-member) on the current [Roster](https://github.com/chivoi/roster-rosie/wiki/Resources-&-Definitions#roster).
+
 ```bash
-GET /api/all-team-member
+GET /api/all-team-members
 ```
 
 ## Example request
@@ -10,7 +12,7 @@ GET /api/all-team-member
   <summary>CURL</summary>
 
   ```bash
-  $ curl https://roster-rosie.site.com/api/all-team-member
+  $ curl https://roster-rosie.site.com/api/all-team-members
   ```
 
 </details>
@@ -22,7 +24,7 @@ GET /api/all-team-member
     require "net/http"
 
     # build request
-    uri = URI("https://roster-rosie.site.com/api/all-team-member")
+    uri = URI("https://roster-rosie.site.com/api/all-team-members")
     request = Net::HTTP::Get.new(uri, "Content-Type": "application/json")
     # send request
     response = Net::HTTP.start uri.hostname, uri.port, use_ssl: true do |http|
@@ -40,7 +42,7 @@ GET /api/all-team-member
 
     const config = {
       method: 'GET',
-      url: 'https://roster-rosie.site.com/api/all-team-member',
+      url: 'https://roster-rosie.site.com/api/all-team-members',
       headers: {
       'Content-Type': 'application/json'
       },
@@ -50,7 +52,7 @@ GET /api/all-team-member
       .then(response => {
         console.log(JSON.stringify(response.data));
       })
-      .catch(e => {
+      .catch(error => {
         console.log(error);
     });
   ```
@@ -59,9 +61,9 @@ GET /api/all-team-member
 
 ## Example response
 
-The successful response will have a `200 OK` response code and a JSON body containing the team [Roster](link):
+The successful response will have a `200 OK` response code and a JSON body containing the team [Roster](https://github.com/chivoi/roster-rosie/wiki/Resources-&-Definitions#roster):
 
-```json
+```bash
 HTTP/1.1 200 OK
 Content-type: application/json
 

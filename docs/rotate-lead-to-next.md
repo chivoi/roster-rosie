@@ -1,26 +1,18 @@
-# Rotate Lead to Next
+# Rotate lead to next in line
 
-When the person on duty is not able to lead (for example, out sick for the week), calling the Rotate Lead to Next endpoint is a quick and handy way to move on to the next person in line.
+When the person on duty is not able to lead (for example, out sick for the week), calling the Rotate lead endpoint is a quick and handy way to move on to the next person in line.
 
 ```bash
 POST /api/rotate-lead
 ```
 
-This endpoint rotates the lead duty to the next [Team Member](link) in the [Roster](link) by adding 1 to both current and next lead indices in the [Duty Object](link), for example `{"current": 0, "next": 1}` will become: `{"current": 1, "next": 2}`.
+This endpoint rotates the lead duty to the next [Team Member](https://github.com/chivoi/roster-rosie/wiki/Resources-&-Definitions#team-member) in the [Roster](https://github.com/chivoi/roster-rosie/wiki/Resources-&-Definitions#roster) by adding 1 to both current and next lead indices in the [Duty Object](https://github.com/chivoi/roster-rosie/wiki/Resources-&-Definitions#duty-object), for example `{"current": 0, "next": 1}` will become: `{"current": 1, "next": 2}`.
 
-The API takes a body specifying the event that the lead needs to be rotated for:
+The API takes a body specifying the [Event](https://github.com/chivoi/roster-rosie/wiki/Resources-&-Definitions#events) that the lead is to be rotated for:
 
 | Name | Required | Type | Description |
 | :--- | :---: | :---: |:--- |
 | event | yes | string | "standup" or "retro" |
-
-## Request headers (optional)
-
-This is a very simple API, and this endpoint does not require any special headers, but for the sake of demonstration let's pretend it might.
-
-| Name | Type |   Description |
-| :--- | :---:  |:--- |
-| Authorization | string | Bearer token. To learn more about what it is and how to generate it, click this [empty link](empty.link) |
 
 ## Example request
 
@@ -29,7 +21,6 @@ This is a very simple API, and this endpoint does not require any special header
 
   ```bash
   $ curl -X POST  https://roster-rosie.site.com/api/rotate-lead \
-    -H "Authorization: Bearer <your_bearer_token>" \
     -H "Content-Type: application/json" \
     -d '{"event": "standup"}'
   ```
@@ -44,10 +35,8 @@ This is a very simple API, and this endpoint does not require any special header
 
     # build request
     uri = URI("https://roster-rosie.site.com/api/rotate-lead")
-    token = "Sample-bearer-token"
     json_body = '{"event": "standup"}'
     request = Net::HTTP::Post.new(uri, "Content-Type": "application/json")
-    request["Authorization"] = "Bearer #{token}"
     request.body = json_body
     # send request
     response = Net::HTTP.start uri.hostname, uri.port, use_ssl: true do |http|
@@ -67,8 +56,7 @@ This is a very simple API, and this endpoint does not require any special header
       method: 'post',
       url: 'https://roster-rosie.site.com/api/rotate-lead',
       headers: {
-      'Content-Type': 'application/json',
-      'Authorization': 'Bearer <token-value>',
+      'Content-Type': 'application/json'
       },
       data: {
         event: 'retro',
@@ -79,7 +67,7 @@ This is a very simple API, and this endpoint does not require any special header
       .then(response => {
         console.log(JSON.stringify(response.data));
       })
-      .catch(e => {
+      .catch(error => {
         console.log(error);
     });
   ```
@@ -88,7 +76,7 @@ This is a very simple API, and this endpoint does not require any special header
 
 ## Example response
 
-Successful request will return `200 OK` response code and a confirmation message containing the name of the current lead after rotation (can be used for logging purposes).
+A successful request will return `200 OK` response code and a confirmation message containing the name of the current lead after rotation (can be used for logging purposes).
 
 ```bash
 
@@ -96,4 +84,23 @@ HTTP/1.1 200 OK
 
 "===== The current lead is updated to Aimee Lou Wood ====="
 
+```
+
+## Troubleshooting
+
+### 400 Bad Request
+
+This likely means that either your request URL is malformed, or the content type of the request body is incorrect.
+* Check the URL and make sure it looks like: `/api/rotate-lead`.
+* Make sure you set the `Content-Type` header to `application/json`.
+
+Please refer to [code examples](#example-request) for request examples in select languages.
+
+### 422 Unprocessable Entity
+
+This may mean that your request body looks good, but the data in it is incorrect. Make sure that your request body contains a valid and [supported event type](https://github.com/chivoi/roster-rosie/wiki/Resources-&-Definitions#supported-events):
+```javascript
+{
+  "event": "standup" // or "retro"
+}
 ```

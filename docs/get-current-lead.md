@@ -1,6 +1,6 @@
 # Get current lead
 
-This is a test/development endpoint that is called to get the name of the current lead for the given [Event](link).
+This is a test/development endpoint that is called to get the name of the current lead for the given [Event](http://github.com/chivoi/roster-rosie/wiki/Resources-&-Definitions#events).
 
 ```bash
 GET /api/current-lead/{event}
@@ -54,7 +54,7 @@ GET /api/current-lead/{event}
       .then(response => {
         console.log(JSON.stringify(response.data));
       })
-      .catch(e => {
+      .catch(error => {
         console.log(error);
     });
   ```
@@ -63,10 +63,15 @@ GET /api/current-lead/{event}
 
 ## Example response
 
-Successful request will return `200 OK` response code and the name of the [Team Member](link) that is the current lead of your event:
+A successful request will return `200 OK` response code and the name of the [Team Member](https://github.com/chivoi/roster-rosie/wiki/Resources-&-Definitions#team-member) who is the current lead of your [Event](https://github.com/chivoi/roster-rosie/wiki/Resources-&-Definitions#events):
 
-```json
+```bash
 HTTP/1.1 200 OK
 
 "Walter Goggins"
 ```
+## Troubleshooting
+
+### 400 Bad Request
+
+This means that your request URL might be malformed and/or incomplete. Check the URL and make sure you have specified the event you are requesting a lead for: `/api/current-lead/standup` or `/api/current-lead/retro`. Please refer to [code examples](#example-request) for request examples in select languages.

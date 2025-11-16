@@ -1,6 +1,6 @@
 # Get next lead
 
-This is a test/development endpoint that is called to get the name of the next lead for the given [Event](link).
+This is a test/development endpoint that is called to get the name of the next lead for the given [Event](https://github.com/chivoi/roster-rosie/wiki/Resources-&-Definitions#events).
 
 ```bash
 GET /api/next-lead/{event}
@@ -14,8 +14,7 @@ GET /api/next-lead/{event}
   <summary>CURL</summary>
 
   ```bash
-  $ curl https://roster-rosie.site.com/api/next-lead/standup \
-    -H "Authorization: Bearer <your_bearer_token>"
+  $ curl https://roster-rosie.site.com/api/next-lead/standup
   ```
 
 </details>
@@ -28,9 +27,7 @@ GET /api/next-lead/{event}
 
     # build request
     uri = URI("https://roster-rosie.site.com/api/next-lead/standup")
-    token = "Sample-bearer-token"
     request = Net::HTTP::Get.new(uri, "Content-Type": "application/json")
-    request["Authorization"] = "Bearer #{token}"
     # send request
     response = Net::HTTP.start uri.hostname, uri.port, use_ssl: true do |http|
       http.request(request)
@@ -49,8 +46,7 @@ GET /api/next-lead/{event}
       method: 'GET',
       url: 'https://roster-rosie.site.com/api/next-lead/retro',
       headers: {
-      'Content-Type': 'application/json',
-      'Authorization': 'Bearer <token-value>',
+      'Content-Type': 'application/json'
       },
     };
 
@@ -58,7 +54,7 @@ GET /api/next-lead/{event}
       .then(response => {
         console.log(JSON.stringify(response.data));
       })
-      .catch(e => {
+      .catch(error => {
         console.log(error);
     });
   ```
@@ -67,10 +63,15 @@ GET /api/next-lead/{event}
 
 ## Example response
 
-Successful request will return `200 OK` response code and the name of the [Team Member](link) that is the next lead of your event:
+A successful request will return `200 OK` response code and the name of the [Team Member](https://github.com/chivoi/roster-rosie/wiki/Resources-&-Definitions#team-member) who is the next lead of your [Event](https://github.com/chivoi/roster-rosie/wiki/Resources-&-Definitions#events):
 
-```json
+```bash
 HTTP/1.1 200 OK
 
 "Aimee Lou Wood"
 ```
+## Troubleshooting
+
+### 400 Bad Request
+
+This means that your request URL might be malformed and/or incomplete. Check the URL and make sure you have specified the event you are requesting a lead for: `/api/next-lead/standup` or `/api/next-lead/retro`. Please refer to [code examples](#example-request) for request examples in select languages.
